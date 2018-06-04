@@ -2,6 +2,12 @@ const { GraphQLServer } = require('graphql-yoga')
 const _ = require('lodash')
 const { Prisma } = require('prisma-binding')
 
+const Query = require('./resolvers/Query')
+const Mutation = require('./resolvers/Mutation')
+const AuthPayload = require('./resolvers/AuthPayload')
+const Subscription = require('./resolvers/Subscription')
+
+
 let links = [{
     id: 'link-0',
     url: 'www.howtographql.com',
@@ -9,44 +15,14 @@ let links = [{
   }]
 
 let idCount = links.length
-// 2
+
 const resolvers = {
-  Query: {
-    info: () => `This is the API of a Hackernews Clone`,
-    feed: (root, args, context, info) => {
-      return context.db.query.links({}, info)
-    },
-    link: (root, {id}) => {
-      return context.db.query.links({id:id}, info)
-    },
-  },
-  Link: {
-    id: (root) => root.id,
-    description: (root) => root.description,
-    url: (root) => root.url,
-  },
-  Mutation: {
-    // 2
-    post: (root, args) => {
-      return context.db.mutation.createLink({
-        data: {
-          url: args.url,
-          description: args.description,
-        },
-      }, info)
-    },
-    deleteLink: (root, args) => {
-      return context.db.mutation.deleteLink({
-        where: {
-          id: args.id
-        },
-      }, info)
-    },
-    deleteLink: (root, {id}) => _.remove(links, link=> link.id === id)[0]
-  },
+  Query,
+  Mutation,
+  AuthPayload,
+  Subscription,
 }
 
-// 3
 const server = new GraphQLServer({
   typeDefs: './src/schema.graphql',
   resolvers,
